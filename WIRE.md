@@ -68,10 +68,11 @@ Field order: `type, id, stream, [error | dataLen, data]`.
 | `0x100` | REQUEST  | frame flows in the request direction  |
 | `0x200` | RESPONSE | frame flows in the response direction |
 
-There are two distinct encodings for "open a stream," and they are not interchangeable:
+There are three distinct encodings that carry `OPEN`, and they are not interchangeable:
 
-- **Stream-open** (the very first frame that establishes a stream) is a REQUEST or RESPONSE message (`type = 1` or `type = 2`) whose `stream` field is exactly `0x1` (`OPEN`), with no direction bit and no other action bit set.
-- **Every other stream control or data frame** (close, pause, resume, data, end, destroy, error, and any subsequent traffic on that stream) is a STREAM message (`type = 3`) whose `stream` field OR's a direction bit (`0x100` for a frame flowing in the request direction, `0x200` for the response direction) with one or more action bits. For example a response-side data frame is `RESPONSE | DATA = 0x200 | 0x10 = 0x210`, and a request-side close-with-error is `REQUEST | CLOSE | ERROR = 0x100 | 0x2 | 0x80 = 0x182`.
+- **Initiator stream-open** (the very first frame that establishes a stream, sent by the side that owns the REQUEST or RESPONSE message) is a REQUEST or RESPONSE message (`type = 1` or `type = 2`) whose `stream` field is exactly `0x1` (`OPEN`), with no direction bit and no other action bit set. `fixtures/envelope` covers this as "request stream-open" (`type = 1`, `stream = 1`) and "response stream-open" (`type = 2`, `stream = 1`).
+- **Receiver stream-open** (the acknowledgement sent back on the STREAM channel once the receiving side opens its end) is a STREAM message (`type = 3`) whose `stream` field OR's a direction bit with the `OPEN` bit and no other action bit: `REQUEST | OPEN = 0x100 | 0x1 = 0x101` or `RESPONSE | OPEN = 0x200 | 0x1 = 0x201`. `fixtures/envelope` covers this as "stream request open" (`type = 3`, `stream = 257 = 0x101`) and "stream response open" (`type = 3`, `stream = 513 = 0x201`).
+- **Every other stream control or data frame** (close, pause, resume, data, end, destroy, error, and any subsequent traffic on that stream) is likewise a STREAM message (`type = 3`) whose `stream` field OR's a direction bit (`0x100` for a frame flowing in the request direction, `0x200` for the response direction) with one or more action bits other than `OPEN`. For example a response-side data frame is `RESPONSE | DATA = 0x200 | 0x10 = 0x210`, and a request-side close-with-error is `REQUEST | CLOSE | ERROR = 0x100 | 0x2 | 0x80 = 0x182`.
 
 `fixtures/error` includes stream-close-with-error and stream-destroy-with-error vectors in both directions; `fixtures/sequence` exercises a full open/data/data/end sequence.
 
