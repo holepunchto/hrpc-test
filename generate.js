@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const c = require('compact-encoding') // used by the dispatch family in Task 7
 const { encodeFrame, toHex } = require('./lib/frame')
-const { ENVELOPE, ERROR, BOUNDARY } = require('./lib/cases')
+const { ENVELOPE, ERROR, BOUNDARY, SEQUENCE } = require('./lib/cases')
 
 function serializeDescriptor(d) {
   const out = { ...d }
@@ -36,3 +36,11 @@ console.log('generated error fixtures')
 
 writeFamily(path.join(__dirname, 'fixtures', 'boundary'), BOUNDARY)
 console.log('generated boundary fixtures')
+
+const seq = Buffer.concat(SEQUENCE.map(encodeFrame))
+fs.mkdirSync(path.join(__dirname, 'fixtures', 'sequence'), { recursive: true })
+fs.writeFileSync(
+  path.join(__dirname, 'fixtures', 'sequence', 'frames.json'),
+  JSON.stringify({ concatenated: toHex(seq), count: SEQUENCE.length }, null, 2) + '\n'
+)
+console.log('generated sequence fixture')

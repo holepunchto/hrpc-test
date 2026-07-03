@@ -1,6 +1,7 @@
 const test = require('brittle')
 const fs = require('fs')
 const path = require('path')
+const c = require('compact-encoding')
 const { encodeFrame, toHex, decodeFrame } = require('../lib/frame')
 const { ENVELOPE, ERROR, BOUNDARY } = require('../lib/cases')
 
@@ -58,4 +59,19 @@ test('boundary: frames match and re-decode', function (t) {
       BOUNDARY[i].note + ' data length'
     )
   }
+})
+
+const seqDir = path.join(__dirname, '..', 'fixtures', 'sequence')
+test('sequence: concatenated frames re-split by length prefix', function (t) {
+  const { concatenated, count } = JSON.parse(fs.readFileSync(path.join(seqDir, 'frames.json')))
+  const buf = Buffer.from(concatenated, 'hex')
+  const state = c.state(0, buf.length, buf)
+  let seen = 0
+  const m = require('bare-rpc/messages')
+  while (state.start < state.end) {
+    const msg = m.message.decode(state)
+    t.ok(msg, 'frame ' + seen)
+    seen++
+  }
+  t.is(seen, count, 'all frames re-split')
 })
