@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "id": 0,
+      "name": "@greeter/hello",
+      "request": {
+        "name": "@greeter/hello-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@greeter/hello-response",
+        "stream": false
+      },
+      "version": 1
+    },
+    {
+      "id": 1,
+      "name": "@greeter/ping",
+      "request": {
+        "name": "@greeter/ping-request",
+        "stream": false,
+        "send": true
+      },
+      "response": null,
+      "version": 1
+    }
+  ]
+}

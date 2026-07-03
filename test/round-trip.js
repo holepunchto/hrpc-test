@@ -4,6 +4,7 @@ const path = require('path')
 const c = require('compact-encoding')
 const { encodeFrame, toHex, decodeFrame } = require('../lib/frame')
 const { ENVELOPE, ERROR, BOUNDARY } = require('../lib/cases')
+const { build } = require('../lib/dispatch-cases')
 
 const dir = path.join(__dirname, '..', 'fixtures', 'envelope')
 const errDir = path.join(__dirname, '..', 'fixtures', 'error')
@@ -74,4 +75,28 @@ test('sequence: concatenated frames re-split by length prefix', function (t) {
     seen++
   }
   t.is(seen, count, 'all frames re-split')
+})
+
+const dispatchDir = path.join(__dirname, '..', 'fixtures', 'dispatch')
+test('dispatch: frames carry schema-derived command ids and payloads round-trip', function (t) {
+  const d = build()
+  const frames = JSON.parse(fs.readFileSync(path.join(dispatchDir, 'frames.json')))
+  const messages = JSON.parse(fs.readFileSync(path.join(dispatchDir, 'messages.json')))
+  t.is(frames.length, messages.length, 'one frame per message')
+
+  const helloRequest = decodeFrame(Buffer.from(frames[0], 'hex'))
+  t.is(helloRequest.command, d.commands.hello, 'hello request command id')
+  t.alike(c.decode(d.helloRequest, helloRequest.data), { name: 'ada' }, 'hello request payload')
+
+  const helloResponse = decodeFrame(Buffer.from(frames[1], 'hex'))
+  t.alike(
+    c.decode(d.helloResponse, helloResponse.data),
+    { text: 'hi ada' },
+    'hello response payload'
+  )
+
+  const pingEvent = decodeFrame(Buffer.from(frames[2], 'hex'))
+  t.is(pingEvent.id, 0, 'ping is an event (id 0)')
+  t.is(pingEvent.command, d.commands.ping, 'ping event command id')
+  t.alike(c.decode(d.pingRequest, pingEvent.data), { seq: 7 }, 'ping event payload')
 })

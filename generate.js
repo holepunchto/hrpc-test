@@ -1,8 +1,9 @@
 const fs = require('fs')
 const path = require('path')
-const c = require('compact-encoding') // used by the dispatch family in Task 7
+const c = require('compact-encoding')
 const { encodeFrame, toHex } = require('./lib/frame')
 const { ENVELOPE, ERROR, BOUNDARY, SEQUENCE } = require('./lib/cases')
+const { build } = require('./lib/dispatch-cases')
 
 function serializeDescriptor(d) {
   const out = { ...d }
@@ -44,3 +45,39 @@ fs.writeFileSync(
   JSON.stringify({ concatenated: toHex(seq), count: SEQUENCE.length }, null, 2) + '\n'
 )
 console.log('generated sequence fixture')
+
+const d = build()
+const dispatch = [
+  {
+    note: 'hello request',
+    descriptor: {
+      type: 1,
+      id: 1,
+      command: d.commands.hello,
+      stream: 0,
+      data: c.encode(d.helloRequest, { name: 'ada' })
+    }
+  },
+  {
+    note: 'hello response',
+    descriptor: {
+      type: 2,
+      id: 1,
+      error: null,
+      stream: 0,
+      data: c.encode(d.helloResponse, { text: 'hi ada' })
+    }
+  },
+  {
+    note: 'ping event',
+    descriptor: {
+      type: 1,
+      id: 0,
+      command: d.commands.ping,
+      stream: 0,
+      data: c.encode(d.pingRequest, { seq: 7 })
+    }
+  }
+]
+writeFamily(path.join(__dirname, 'fixtures', 'dispatch'), dispatch)
+console.log('generated dispatch fixtures')
