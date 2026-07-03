@@ -1,0 +1,36 @@
+{
+  "name": "hrpc-test",
+  "version": "0.0.1",
+  "description": "Cross-language wire-conformance vectors and normative spec for the bare-rpc / hrpc wire protocol",
+  "license": "Apache-2.0",
+  "author": "Holepunch",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/hrpc-test.git"
+  },
+  "exports": {
+    "./package": "./package.json",
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "fixtures"
+  ],
+  "scripts": {
+    "generate": "node generate.js",
+    "test": "brittle test.js",
+    "lint": "prettier --check . && lunte",
+    "format": "prettier --write . && lunte --fix"
+  },
+  "devDependencies": {
+    "bare-rpc": "file:../bare-rpc",
+    "brittle": "^3.7.0",
+    "compact-encoding": "^3.0.0",
+    "hrpc": "^4.3.0",
+    "hyperschema": "^1.21.0",
+    "lunte": "^1.8.0",
+    "prettier": "^3.6.2",
+    "prettier-config-holepunch": "^2.0.0"
+  }
+}
