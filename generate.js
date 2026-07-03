@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const c = require('compact-encoding') // used by the dispatch family in Task 7
 const { encodeFrame, toHex } = require('./lib/frame')
-const { ENVELOPE, ERROR } = require('./lib/cases')
+const { ENVELOPE, ERROR, BOUNDARY } = require('./lib/cases')
 
 function serializeDescriptor(d) {
   const out = { ...d }
@@ -33,3 +33,6 @@ console.log('generated envelope fixtures')
 
 writeFamily(path.join(__dirname, 'fixtures', 'error'), ERROR)
 console.log('generated error fixtures')
+
+writeFamily(path.join(__dirname, 'fixtures', 'boundary'), BOUNDARY)
+console.log('generated boundary fixtures')

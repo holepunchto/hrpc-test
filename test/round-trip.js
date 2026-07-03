@@ -2,7 +2,7 @@ const test = require('brittle')
 const fs = require('fs')
 const path = require('path')
 const { encodeFrame, toHex, decodeFrame } = require('../lib/frame')
-const { ENVELOPE, ERROR } = require('../lib/cases')
+const { ENVELOPE, ERROR, BOUNDARY } = require('../lib/cases')
 
 const dir = path.join(__dirname, '..', 'fixtures', 'envelope')
 const errDir = path.join(__dirname, '..', 'fixtures', 'error')
@@ -41,5 +41,21 @@ test('error: frames match and codes decode as expected', function (t) {
     t.is(toHex(encodeFrame(cse.descriptor)), frames[i], cse.note + ' frame')
     const msg = decodeFrame(Buffer.from(frames[i], 'hex'))
     if ('expectCode' in cse) t.is(msg.error.code, cse.expectCode, cse.note + ' code')
+  }
+})
+
+const bDir = path.join(__dirname, '..', 'fixtures', 'boundary')
+test('boundary: frames match and re-decode', function (t) {
+  const frames = JSON.parse(fs.readFileSync(path.join(bDir, 'frames.json')))
+  for (let i = 0; i < BOUNDARY.length; i++) {
+    t.is(toHex(encodeFrame(BOUNDARY[i].descriptor)), frames[i], BOUNDARY[i].note)
+    const msg = decodeFrame(Buffer.from(frames[i], 'hex'))
+    t.is(msg.id, BOUNDARY[i].descriptor.id, BOUNDARY[i].note + ' id')
+    t.is(msg.command, BOUNDARY[i].descriptor.command, BOUNDARY[i].note + ' command')
+    t.is(
+      msg.data ? msg.data.length : 0,
+      BOUNDARY[i].descriptor.data ? BOUNDARY[i].descriptor.data.length : 0,
+      BOUNDARY[i].note + ' data length'
+    )
   }
 })
