@@ -29,5 +29,6 @@ test('envelope: zero-length buffer decodes to an empty Buffer, not null', functi
   t.ok(index !== -1, 'zero-length buffer case exists')
   const buf = Buffer.from(frames[index], 'hex')
   const { data } = decodeFrame(buf)
-  t.ok(Buffer.isBuffer(data) && data.length === 0, 'decodes to a zero-length Buffer')
+  t.ok(Buffer.isBuffer(data), 'zero-length payload decodes to a Buffer, not null')
+  t.is(data.length, 0, 'zero-length payload decodes to an empty buffer')
 })
