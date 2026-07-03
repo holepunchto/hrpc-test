@@ -2,9 +2,10 @@ const test = require('brittle')
 const fs = require('fs')
 const path = require('path')
 const { encodeFrame, toHex, decodeFrame } = require('../lib/frame')
-const { ENVELOPE } = require('../lib/cases')
+const { ENVELOPE, ERROR } = require('../lib/cases')
 
 const dir = path.join(__dirname, '..', 'fixtures', 'envelope')
+const errDir = path.join(__dirname, '..', 'fixtures', 'error')
 
 test('envelope: generated frames match committed fixtures', function (t) {
   const frames = JSON.parse(fs.readFileSync(path.join(dir, 'frames.json')))
@@ -31,4 +32,14 @@ test('envelope: zero-length buffer decodes to an empty Buffer, not null', functi
   const { data } = decodeFrame(buf)
   t.ok(Buffer.isBuffer(data), 'zero-length payload decodes to a Buffer, not null')
   t.is(data.length, 0, 'zero-length payload decodes to an empty buffer')
+})
+
+test('error: frames match and codes decode as expected', function (t) {
+  const frames = JSON.parse(fs.readFileSync(path.join(errDir, 'frames.json')))
+  for (let i = 0; i < ERROR.length; i++) {
+    const cse = ERROR[i]
+    t.is(toHex(encodeFrame(cse.descriptor)), frames[i], cse.note + ' frame')
+    const msg = decodeFrame(Buffer.from(frames[i], 'hex'))
+    if ('expectCode' in cse) t.is(msg.error.code, cse.expectCode, cse.note + ' code')
+  }
 })
