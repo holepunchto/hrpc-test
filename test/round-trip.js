@@ -22,3 +22,12 @@ test('envelope: every frame decodes without throwing', function (t) {
     t.ok(msg && typeof msg.type === 'number', ENVELOPE[i].note + ' decodes')
   }
 })
+
+test('envelope: zero-length buffer decodes to an empty Buffer, not null', function (t) {
+  const frames = JSON.parse(fs.readFileSync(path.join(dir, 'frames.json')))
+  const index = ENVELOPE.findIndex((c) => c.note.includes('zero-length buffer'))
+  t.ok(index !== -1, 'zero-length buffer case exists')
+  const buf = Buffer.from(frames[index], 'hex')
+  const { data } = decodeFrame(buf)
+  t.ok(Buffer.isBuffer(data) && data.length === 0, 'decodes to a zero-length Buffer')
+})
