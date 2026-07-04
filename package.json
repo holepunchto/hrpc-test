@@ -24,7 +24,7 @@
     "format": "prettier --write . && lunte --fix"
   },
   "devDependencies": {
-    "bare-rpc": "file:../bare-rpc",
+    "bare-rpc": "^1.3.4",
     "brittle": "^3.7.0",
     "compact-encoding": "^3.0.0",
     "hrpc": "^4.3.0",
