@@ -2,12 +2,33 @@ const test = require('brittle')
 const fs = require('fs')
 const path = require('path')
 const c = require('compact-encoding')
-const { encodeFrame, toHex, decodeFrame } = require('../lib/frame')
+const { encodeFrame, toHex, decodeFrame, serializeDescriptor } = require('../lib/frame')
 const { ENVELOPE, ERROR, BOUNDARY } = require('../lib/cases')
 const { build } = require('../lib/dispatch-cases')
 
 const dir = path.join(__dirname, '..', 'fixtures', 'envelope')
 const errDir = path.join(__dirname, '..', 'fixtures', 'error')
+
+const fixturesDir = path.join(__dirname, '..', 'fixtures')
+
+// The cross-language contract is the (frames.json, messages.json) pair: a
+// foreign implementation reads messages.json as the description of the bytes in
+// frames.json. Assert every committed frame decodes back to exactly its
+// committed description - this validates the decode direction and that the two
+// files agree. serializeDescriptor is the same projection generate.js uses, so
+// a decoded message maps into the identical JSON shape messages.json stores.
+test('messages.json describes frames.json (decode round-trips)', function (t) {
+  for (const family of ['envelope', 'error', 'boundary', 'dispatch']) {
+    const familyDir = path.join(fixturesDir, family)
+    const frames = JSON.parse(fs.readFileSync(path.join(familyDir, 'frames.json')))
+    const messages = JSON.parse(fs.readFileSync(path.join(familyDir, 'messages.json')))
+    t.is(frames.length, messages.length, family + ': one frame per message')
+    for (let i = 0; i < frames.length; i++) {
+      const decoded = serializeDescriptor(decodeFrame(Buffer.from(frames[i], 'hex')))
+      t.alike(decoded, messages[i].descriptor, family + ': ' + messages[i].note)
+    }
+  }
+})
 
 test('envelope: generated frames match committed fixtures', function (t) {
   const frames = JSON.parse(fs.readFileSync(path.join(dir, 'frames.json')))
