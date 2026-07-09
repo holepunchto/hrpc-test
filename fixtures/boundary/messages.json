@@ -6,7 +6,7 @@
       "id": 252,
       "command": 0,
       "stream": 0,
-      "data": null
+      "data": ""
     }
   },
   {
@@ -16,7 +16,7 @@
       "id": 253,
       "command": 0,
       "stream": 0,
-      "data": null
+      "data": ""
     }
   },
   {
@@ -26,7 +26,7 @@
       "id": 65536,
       "command": 0,
       "stream": 0,
-      "data": null
+      "data": ""
     }
   },
   {
@@ -36,7 +36,7 @@
       "id": 1,
       "command": 253,
       "stream": 0,
-      "data": null
+      "data": ""
     }
   },
   {
