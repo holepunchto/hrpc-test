@@ -1,2 +1,4 @@
 fixtures/
 !fixtures/negative/
+.pytest_cache
+dist

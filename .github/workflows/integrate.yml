@@ -4,6 +4,8 @@ on:
     branches:
       - main
   pull_request:
+permissions:
+  contents: read
 jobs:
   lint:
     runs-on: ubuntu-24.04
@@ -17,3 +19,13 @@ jobs:
     steps:
       - uses: holepunchto/actions/node-base@v1
       - run: npm test
+  python:
+    runs-on: ubuntu-24.04
+    name: Python
+    steps:
+      - uses: holepunchto/actions/python-base@v1
+      - run: pytest
+      # python-base installs editable, which reads the fixtures from the repo
+      # root - build a wheel too so a missing force-include fails here
+      - run: pip wheel --no-deps --wheel-dir dist .
+      - run: python test/wheel.py
