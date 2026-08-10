@@ -31,7 +31,7 @@ type: RESPONSE = 2
 type: STREAM = 3
 ```
 
-An unrecognized `type` value is a decode error (`fixtures/negative` includes a vector with `type = 99`).
+An unrecognized `type` value is a decode error, not a frame to skip - see [Rejecting frames](#rejecting-frames) (`fixtures/negative` includes a vector with `type = 99`).
 
 ### REQUEST (`type = 1`)
 
@@ -95,6 +95,15 @@ The canonical field name is `errno`, not `status`. `code` is always a string on 
 - A frame with `stream === 0` (REQUEST, or RESPONSE without an error) always decodes `data` as a `Buffer`, including when `dataLen` is `0` - the result is an empty buffer, not `null`. `fixtures/envelope` includes a zero-length-payload vector asserting the decoded value is a zero-length `Buffer`.
 - A frame with `stream !== 0` and no `DATA`/`ERROR` bit (bare stream control frames such as open, close, pause, resume, end, destroy) decodes `data` as `null` - there is no `dataLen` field on the wire for these frames at all.
 
+## Rejecting frames
+
+A decoder rejects two distinct classes of input, and in both it must signal the failure to its caller rather than skip the frame and carry on:
+
+- **Malformed** - the frame cannot be parsed at all. The length prefix promises more bytes than follow, or a field runs past the end of the body. `fixtures/negative` includes a truncated frame: a length of 4 with no body bytes.
+- **Unrecognized** - the frame parses, but names something this format does not define. The only such case today is a `type` outside 1-3, whose length, `type` and `id` all decode cleanly. `fixtures/negative` includes `type = 99`.
+
+The second class is an error rather than something to ignore because the type space is closed: a peer sending a type this format does not define is either corrupt or not speaking this protocol, and continuing past it silently hides both. Adding a message type is a coordinated change across implementations, not something a decoder absorbs on its own. Returning "no message" and reading the next frame does not satisfy either class.
+
 ## Fixtures
 
-`fixtures/` is the machine-checkable form of every rule in this document: `envelope/` covers the three message types and payload/null semantics, `error/` covers the error struct and the null/undefined-code regression, `boundary/` covers varint tag-width thresholds, `negative/` covers malformed input a decoder must reject, `sequence/` covers a multi-frame stream concatenated into one buffer, and `dispatch/` covers schema-bound command dispatch. Each family's `frames.json` holds the canonical hex bytes and `messages.json` (or the family's own structure) holds the decoded message each frame corresponds to. An implementation is wire-conformant if it can decode every fixture frame into the described message and re-encode every described message into the exact fixture frame.
+`fixtures/` is the machine-checkable form of every rule in this document: `envelope/` covers the three message types and payload/null semantics, `error/` covers the error struct and the null/undefined-code regression, `boundary/` covers varint tag-width thresholds, `negative/` covers both classes of input a decoder must reject, `sequence/` covers a multi-frame stream concatenated into one buffer, and `dispatch/` covers schema-bound command dispatch. Each family's `frames.json` holds the canonical hex bytes and `messages.json` (or the family's own structure) holds the decoded message each frame corresponds to. An implementation is wire-conformant if it can decode every fixture frame into the described message and re-encode every described message into the exact fixture frame.
