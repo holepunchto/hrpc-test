@@ -1,0 +1,42 @@
+[
+  {
+    "note": "hello request, id 1 at position 0 - resolves to ping if keyed by position",
+    "descriptor": {
+      "type": 1,
+      "id": 1,
+      "command": 1,
+      "stream": 0,
+      "data": "03616461"
+    }
+  },
+  {
+    "note": "ping event, id 0 at position 1 - resolves to hello if keyed by position",
+    "descriptor": {
+      "type": 1,
+      "id": 0,
+      "command": 0,
+      "stream": 0,
+      "data": "07"
+    }
+  },
+  {
+    "note": "farewell request, id 5 at position 2 - no position 5 exists, so keying by position fails outright",
+    "descriptor": {
+      "type": 1,
+      "id": 2,
+      "command": 5,
+      "stream": 0,
+      "data": "03616461"
+    }
+  },
+  {
+    "note": "farewell response",
+    "descriptor": {
+      "type": 2,
+      "id": 2,
+      "stream": 0,
+      "error": null,
+      "data": "0762796520616461"
+    }
+  }
+]
