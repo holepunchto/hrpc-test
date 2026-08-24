@@ -1,2 +1,4 @@
 fixtures/dispatch/hrpc/
 fixtures/dispatch/schema/
+fixtures/dispatch-sparse/hrpc/
+fixtures/dispatch-sparse/schema/

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "name": "hello-request",
+      "namespace": "sparse",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "name",
+          "required": true,
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "hello-response",
+      "namespace": "sparse",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "text",
+          "required": true,
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "ping-request",
+      "namespace": "sparse",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "seq",
+          "required": true,
+          "type": "uint",
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

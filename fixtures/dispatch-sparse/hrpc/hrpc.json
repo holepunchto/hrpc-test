@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "id": 1,
+      "name": "@sparse/hello",
+      "request": {
+        "name": "@sparse/hello-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@sparse/hello-response",
+        "stream": false
+      },
+      "version": 1
+    },
+    {
+      "id": 0,
+      "name": "@sparse/ping",
+      "request": {
+        "name": "@sparse/ping-request",
+        "stream": false,
+        "send": true
+      },
+      "response": null,
+      "version": 1
+    },
+    {
+      "id": 5,
+      "name": "@sparse/farewell",
+      "request": {
+        "name": "@sparse/hello-request",
+        "stream": false
+      },
+      "response": {
+        "name": "@sparse/hello-response",
+        "stream": false
+      },
+      "version": 1
+    }
+  ]
+}

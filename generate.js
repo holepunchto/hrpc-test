@@ -4,6 +4,7 @@ const c = require('compact-encoding')
 const { encodeFrame, toHex, decodeFrame, serializeDescriptor } = require('./lib/frame')
 const { ENVELOPE, ERROR, BOUNDARY, SEQUENCE } = require('./lib/cases')
 const { build } = require('./lib/dispatch-cases')
+const { build: buildSparse } = require('./lib/dispatch-sparse-cases')
 
 function writeFamily(dir, cases) {
   fs.mkdirSync(dir, { recursive: true })
@@ -72,3 +73,52 @@ const dispatch = [
 ]
 writeFamily(path.join(__dirname, 'fixtures', 'dispatch'), dispatch)
 console.log('generated dispatch fixtures')
+
+// Sparse ids: every command below carries its declared id, which is what the
+// wire identifier is. See lib/dispatch-sparse-cases.js for why these ids and
+// what an implementation keying off handler position gets wrong instead.
+const s = buildSparse()
+const sparse = [
+  {
+    note: 'hello request, id 1 at position 0 - resolves to ping if keyed by position',
+    descriptor: {
+      type: 1,
+      id: 1,
+      command: s.commands.hello,
+      stream: 0,
+      data: c.encode(s.helloRequest, { name: 'ada' })
+    }
+  },
+  {
+    note: 'ping event, id 0 at position 1 - resolves to hello if keyed by position',
+    descriptor: {
+      type: 1,
+      id: 0,
+      command: s.commands.ping,
+      stream: 0,
+      data: c.encode(s.pingRequest, { seq: 7 })
+    }
+  },
+  {
+    note: 'farewell request, id 5 at position 2 - no position 5 exists, so keying by position fails outright',
+    descriptor: {
+      type: 1,
+      id: 2,
+      command: s.commands.farewell,
+      stream: 0,
+      data: c.encode(s.helloRequest, { name: 'ada' })
+    }
+  },
+  {
+    note: 'farewell response',
+    descriptor: {
+      type: 2,
+      id: 2,
+      error: null,
+      stream: 0,
+      data: c.encode(s.helloResponse, { text: 'bye ada' })
+    }
+  }
+]
+writeFamily(path.join(__dirname, 'fixtures', 'dispatch-sparse'), sparse)
+console.log('generated dispatch-sparse fixtures')

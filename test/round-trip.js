@@ -18,7 +18,7 @@ const fixturesDir = path.join(__dirname, '..', 'fixtures')
 // files agree. serializeDescriptor is the same projection generate.js uses, so
 // a decoded message maps into the identical JSON shape messages.json stores.
 test('messages.json describes frames.json (decode round-trips)', function (t) {
-  for (const family of ['envelope', 'error', 'boundary', 'dispatch']) {
+  for (const family of ['envelope', 'error', 'boundary', 'dispatch', 'dispatch-sparse']) {
     const familyDir = path.join(fixturesDir, family)
     const frames = JSON.parse(fs.readFileSync(path.join(familyDir, 'frames.json')))
     const messages = JSON.parse(fs.readFileSync(path.join(familyDir, 'messages.json')))
