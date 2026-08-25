@@ -1,11 +1,11 @@
 const fs = require('fs')
 const path = require('path')
 
-const FAMILIES = ['envelope', 'error', 'boundary', 'dispatch', 'dispatch-sparse']
-
 function readJSON(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'))
 }
+
+const FAMILIES = readJSON(path.join(__dirname, 'fixtures', 'families.json'))
 
 // Families with {messages.json, frames.json} (index-aligned).
 function loadFamily(name) {
