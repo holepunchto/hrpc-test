@@ -2,6 +2,8 @@
 show - it reads them from the repo root instead."""
 
 import glob
+import json
+import pathlib
 import sys
 import zipfile
 
@@ -16,7 +18,11 @@ packaged = [n for n in names if n.startswith("hrpc_test/fixtures/")]
 if not packaged:
     sys.exit(f"{wheels[0]} carries no fixtures")
 
-for expected in ["envelope", "error", "boundary", "dispatch", "negative", "sequence"]:
+expected_families = json.loads(
+    (pathlib.Path(__file__).parent.parent / "fixtures" / "families.json").read_text()
+) + ["negative", "sequence"]
+
+for expected in expected_families:
     if not any(n.startswith(f"hrpc_test/fixtures/{expected}/") for n in packaged):
         sys.exit(f"{wheels[0]} is missing the {expected} fixtures")
 
