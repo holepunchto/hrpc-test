@@ -1,9 +1,6 @@
 const fs = require('fs')
 const path = require('path')
 
-// `dispatch-sparse` is the discriminating counterpart to `dispatch`: its declared
-// command ids are non-contiguous, so registration order and declared id produce
-// different bytes. `dispatch` alone cannot tell the two readings apart.
 const FAMILIES = ['envelope', 'error', 'boundary', 'dispatch', 'dispatch-sparse']
 
 function readJSON(file) {
