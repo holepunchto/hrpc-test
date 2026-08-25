@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const FAMILIES = ['envelope', 'error', 'boundary', 'dispatch']
+const FAMILIES = ['envelope', 'error', 'boundary', 'dispatch', 'dispatch-sparse']
 
 function readJSON(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'))
