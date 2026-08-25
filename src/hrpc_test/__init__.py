@@ -15,7 +15,6 @@ FIXTURES_DIR = (
     _packaged if _packaged.is_dir() else Path(__file__).resolve().parents[2] / "fixtures"
 )
 
-# Read from the same file index.js reads, so the two surfaces cannot drift
 FAMILIES = json.loads((FIXTURES_DIR / "families.json").read_text())
 
 
