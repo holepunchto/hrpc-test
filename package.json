@@ -1,6 +1,6 @@
 {
   "name": "hrpc-test",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Cross-language wire-conformance vectors and normative spec for the bare-rpc / hrpc wire protocol",
   "license": "Apache-2.0",
   "author": "Holepunch",
