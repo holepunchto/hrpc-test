@@ -21,6 +21,21 @@ Signed integers (the error struct's `errno`) use zigzag coding on top of the sam
 
 Encoders MUST emit the minimal-width tag for a given value (e.g. a value of `1` MUST be encoded as the single byte `01`, never as `fd0100`). This is what makes the byte sequences in `fixtures/` canonical: there is exactly one correct encoding for every message in the fixture set, and an implementation's encoder is only conformant if it reproduces those bytes exactly. Decoders, however, are lenient about width: the reference decoder trusts the tag byte and reads that many value bytes without checking whether a narrower tag could have represented the same value. For example decoding `fd0100` (tag `0xfd`, meaning "read a `uint16`") yields `1` without error, even though `1` should have been encoded as a single byte. Do not rely on a decoder rejecting overlong varints - conformant decoders are not required to, and the reference implementation does not. `fixtures/boundary` exercises the tag-width thresholds (values around `0xfc`, `0xffff`) but does not include an overlong-varint reject case, because the reference decoder accepts it.
 
+## Strings
+
+A `utf8` string is a varint byte count followed by that many bytes of UTF-8. Both fields of the error struct use it, and it is the only string encoding on the wire.
+
+The count is **bytes, not characters or code points**. `fixtures/error` includes a message of `nafta éè`, eight characters and ten bytes, whose count byte is `0a`:
+
+```
+0a 6e 61 66 74 61 20 c3 a9 c3 a8
+   n  a  f  t  a  _  <--é--> <--è-->
+```
+
+An empty string is a count of zero with no bytes following, encoded as the single byte `00`; `fixtures/error` covers it for both fields at once. A decoder that reads the count as characters, or that reads to the end of the frame, disagrees with those vectors.
+
+Nothing here constrains what a decoder does with bytes that are not valid UTF-8: the fixture set contains no such vector, so the behaviour is unspecified rather than permitted or forbidden.
+
 ## Message types
 
 The frame body opens with two varints common to every message: `type` and `id`. `type` selects one of three message shapes; the remaining fields depend on it.
@@ -85,6 +100,8 @@ message: utf8
 code: utf8
 errno: int (signed zigzag varint)
 ```
+
+Both strings are encoded as described in [Strings](#strings) - a varint byte count then that many bytes - and there is no framing around the struct itself, so the three fields follow one another directly.
 
 The canonical field name is `errno`, not `status`. `code` is always a string on the wire: if the source value is `null` or `undefined`, it encodes as the empty string, not as an omitted field or a literal `"null"`/`"undefined"`. `fixtures/error` includes both a null-code and an undefined-code case, each expected to decode back to an empty string; this is a regression fixture for a coercion bug where the field was previously stringified through `String(code)`, which produces the text `"null"`/`"undefined"` for those inputs instead of the empty string.
 
