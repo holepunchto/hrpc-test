@@ -25,7 +25,8 @@
   "files": [
     "index.js",
     "lib",
-    "fixtures"
+    "fixtures",
+    "WIRE.md"
   ],
   "scripts": {
     "generate": "node generate.js",
