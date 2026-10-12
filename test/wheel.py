@@ -20,7 +20,7 @@ if not packaged:
 
 expected_families = json.loads(
     (pathlib.Path(__file__).parent.parent / "fixtures" / "families.json").read_text()
-) + ["negative", "sequence"]
+) + ["negative", "decode-only", "sequence"]
 
 for expected in expected_families:
     if not any(n.startswith(f"hrpc_test/fixtures/{expected}/") for n in packaged):

@@ -14,5 +14,9 @@ def test_negative_loads():
     assert hrpc_test.load_negative()
 
 
+def test_decode_only_loads():
+    assert hrpc_test.load_decode_only()
+
+
 def test_sequence_loads():
     assert hrpc_test.load_sequence()["count"]

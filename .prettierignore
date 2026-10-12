@@ -1,4 +1,5 @@
 fixtures/
 !fixtures/negative/
+!fixtures/decode-only/
 .pytest_cache
 dist

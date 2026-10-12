@@ -1,0 +1,7 @@
+[
+  {
+    "hex": "060000000302fd200100",
+    "descriptor": { "type": 3, "id": 2, "stream": 288, "error": null, "data": null },
+    "reason": "stream frame without DATA ignores leftover body bytes"
+  }
+]

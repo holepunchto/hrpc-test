@@ -21,6 +21,12 @@ function loadNegative() {
   return readJSON(path.join(__dirname, 'fixtures', 'negative', 'frames.json'))
 }
 
+// {hex, descriptor, reason}[] a conformant decoder must decode to descriptor;
+// the frames do not re-encode to the same bytes.
+function loadDecodeOnly() {
+  return readJSON(path.join(__dirname, 'fixtures', 'decode-only', 'frames.json'))
+}
+
 // { concatenated, count } - one byte stream of several frames.
 function loadSequence() {
   return readJSON(path.join(__dirname, 'fixtures', 'sequence', 'frames.json'))
@@ -31,5 +37,6 @@ module.exports = {
   fixturesDir: path.join(__dirname, 'fixtures'),
   loadFamily,
   loadNegative,
+  loadDecodeOnly,
   loadSequence
 }
