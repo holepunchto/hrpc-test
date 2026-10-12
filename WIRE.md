@@ -64,7 +64,7 @@ Field order: `type, id, hasError, stream, [error | dataLen, data]`.
 
 Field order: `type, id, stream, [error | dataLen, data]`.
 
-`stream` is a varint whose bits select the message's role (see "Stream flags" below). If `stream & ERROR` is set, the error struct follows. Otherwise if `stream & DATA` is set, `dataLen`/`data` follow. Otherwise no further fields follow. The flags, not the bytes left in the frame, decide whether a payload follows: a frame with neither bit set decodes `data` as `null` even when its length covers further bytes, which it ignores. `fixtures/decode-only` covers this.
+`stream` is a varint whose bits select the message's role (see "Stream flags" below). If `stream & ERROR` is set, the error struct follows. Otherwise if `stream & DATA` is set, `dataLen`/`data` follow. Otherwise no further fields follow. The flags, not the bytes left in the frame, decide whether a payload follows; any bytes left over are ignored as described in [Payload handling](#payload-handling).
 
 ## Stream flags
 

@@ -7,7 +7,7 @@
   {
     "hex": "06000000010107000000",
     "descriptor": { "type": 1, "id": 1, "command": 7, "stream": 0, "data": "" },
-    "reason": "request payload is dataLen bytes, not the rest of the frame"
+    "reason": "request ignores leftover body bytes after the payload"
   },
   {
     "hex": "050000000202000100",
