@@ -37,6 +37,14 @@ def load_negative():
     return _read_json(FIXTURES_DIR / "negative" / "frames.json")
 
 
+def load_decode_only():
+    """{hex, descriptor, reason}[] a conformant decoder must decode to descriptor.
+
+    The frames do not re-encode to the same bytes.
+    """
+    return _read_json(FIXTURES_DIR / "decode-only" / "frames.json")
+
+
 def load_sequence():
     """{concatenated, count} - one byte stream of several frames."""
     return _read_json(FIXTURES_DIR / "sequence" / "frames.json")
@@ -47,5 +55,6 @@ __all__ = [
     "FIXTURES_DIR",
     "load_family",
     "load_negative",
+    "load_decode_only",
     "load_sequence",
 ]
