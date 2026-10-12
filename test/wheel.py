@@ -2,7 +2,6 @@
 show - it reads them from the repo root instead."""
 
 import glob
-import json
 import pathlib
 import sys
 import zipfile
@@ -15,15 +14,15 @@ if not wheels:
 names = zipfile.ZipFile(wheels[0]).namelist()
 packaged = [n for n in names if n.startswith("hrpc_test/fixtures/")]
 
-if not packaged:
-    sys.exit(f"{wheels[0]} carries no fixtures")
+fixtures = pathlib.Path(__file__).parent.parent / "fixtures"
+expected = {
+    f"hrpc_test/fixtures/{p.relative_to(fixtures).as_posix()}"
+    for p in fixtures.rglob("*")
+    if p.is_file()
+}
 
-expected_families = json.loads(
-    (pathlib.Path(__file__).parent.parent / "fixtures" / "families.json").read_text()
-) + ["negative", "decode-only", "sequence"]
-
-for expected in expected_families:
-    if not any(n.startswith(f"hrpc_test/fixtures/{expected}/") for n in packaged):
-        sys.exit(f"{wheels[0]} is missing the {expected} fixtures")
+missing = sorted(expected - set(packaged))
+if missing:
+    sys.exit(f"{wheels[0]} is missing {', '.join(missing)}")
 
 print(f"ok - {len(packaged)} fixture files in {wheels[0]}")
