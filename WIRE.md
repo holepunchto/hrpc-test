@@ -112,6 +112,8 @@ The canonical field name is `errno`, not `status`. `code` is always a string on 
 - A frame with `stream === 0` (REQUEST, or RESPONSE without an error) always decodes `data` as a `Buffer`, including when `dataLen` is `0` - the result is an empty buffer, not `null`. `fixtures/envelope` includes a zero-length-payload vector asserting the decoded value is a zero-length `Buffer`.
 - A frame with `stream !== 0` and no `DATA`/`ERROR` bit (bare stream control frames such as open, close, pause, resume, end, destroy) decodes `data` as `null` - there is no `dataLen` field on the wire for these frames at all.
 
+The frame's length, not its fields, decides where the next frame starts: any bytes the length covers beyond the last field are ignored, whatever the message type. `fixtures/decode-only` has a vector for each type.
+
 ## Rejecting frames
 
 A decoder rejects two distinct classes of input, and in both it must signal the failure to its caller rather than skip the frame and carry on:
