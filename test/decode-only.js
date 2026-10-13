@@ -1,11 +1,7 @@
 const test = require('brittle')
-const fs = require('fs')
-const path = require('path')
 const { decodeFrame, serializeDescriptor } = require('../lib/frame')
 
-const frames = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'decode-only', 'frames.json'))
-)
+const frames = require('..').loadDecodeOnly()
 
 for (const { hex, descriptor, reason } of frames) {
   test('decode-only: ' + reason, function (t) {

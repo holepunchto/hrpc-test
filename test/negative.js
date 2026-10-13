@@ -1,11 +1,7 @@
 const test = require('brittle')
-const fs = require('fs')
-const path = require('path')
 const { decodeFrame } = require('../lib/frame')
 
-const frames = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'negative', 'frames.json'))
-)
+const frames = require('..').loadNegative()
 
 for (const { hex, reason } of frames) {
   test('negative: rejected - ' + reason, function (t) {
