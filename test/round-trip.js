@@ -1,15 +1,9 @@
 const test = require('brittle')
-const fs = require('fs')
-const path = require('path')
 const c = require('compact-encoding')
 const { encodeFrame, toHex, decodeFrame, serializeDescriptor } = require('../lib/frame')
 const { ENVELOPE, ERROR, BOUNDARY } = require('../lib/cases')
 const { build } = require('../lib/dispatch-cases')
-
-const dir = path.join(__dirname, '..', 'fixtures', 'envelope')
-const errDir = path.join(__dirname, '..', 'fixtures', 'error')
-
-const fixturesDir = path.join(__dirname, '..', 'fixtures')
+const { families, loadFamily, loadSequence } = require('..')
 
 // The cross-language contract is the (frames.json, messages.json) pair: a
 // foreign implementation reads messages.json as the description of the bytes in
@@ -18,10 +12,8 @@ const fixturesDir = path.join(__dirname, '..', 'fixtures')
 // files agree. serializeDescriptor is the same projection generate.js uses, so
 // a decoded message maps into the identical JSON shape messages.json stores.
 test('messages.json describes frames.json (decode round-trips)', function (t) {
-  for (const family of ['envelope', 'error', 'boundary', 'dispatch', 'dispatch-sparse']) {
-    const familyDir = path.join(fixturesDir, family)
-    const frames = JSON.parse(fs.readFileSync(path.join(familyDir, 'frames.json')))
-    const messages = JSON.parse(fs.readFileSync(path.join(familyDir, 'messages.json')))
+  for (const family of families) {
+    const { frames, messages } = loadFamily(family)
     t.is(frames.length, messages.length, family + ': one frame per message')
     for (let i = 0; i < frames.length; i++) {
       const decoded = serializeDescriptor(decodeFrame(Buffer.from(frames[i], 'hex')))
@@ -31,7 +23,7 @@ test('messages.json describes frames.json (decode round-trips)', function (t) {
 })
 
 test('envelope: generated frames match committed fixtures', function (t) {
-  const frames = JSON.parse(fs.readFileSync(path.join(dir, 'frames.json')))
+  const { frames } = loadFamily('envelope')
   t.is(frames.length, ENVELOPE.length, 'one frame per case')
   for (let i = 0; i < ENVELOPE.length; i++) {
     t.is(toHex(encodeFrame(ENVELOPE[i].descriptor)), frames[i], ENVELOPE[i].note)
@@ -39,7 +31,7 @@ test('envelope: generated frames match committed fixtures', function (t) {
 })
 
 test('envelope: every frame decodes without throwing', function (t) {
-  const frames = JSON.parse(fs.readFileSync(path.join(dir, 'frames.json')))
+  const { frames } = loadFamily('envelope')
   for (let i = 0; i < frames.length; i++) {
     const buf = Buffer.from(frames[i], 'hex')
     const msg = decodeFrame(buf)
@@ -48,7 +40,7 @@ test('envelope: every frame decodes without throwing', function (t) {
 })
 
 test('envelope: zero-length buffer decodes to an empty Buffer, not null', function (t) {
-  const frames = JSON.parse(fs.readFileSync(path.join(dir, 'frames.json')))
+  const { frames } = loadFamily('envelope')
   const index = ENVELOPE.findIndex((c) => c.note.includes('zero-length buffer'))
   t.ok(index !== -1, 'zero-length buffer case exists')
   const buf = Buffer.from(frames[index], 'hex')
@@ -58,7 +50,7 @@ test('envelope: zero-length buffer decodes to an empty Buffer, not null', functi
 })
 
 test('error: frames match and codes decode as expected', function (t) {
-  const frames = JSON.parse(fs.readFileSync(path.join(errDir, 'frames.json')))
+  const { frames } = loadFamily('error')
   for (let i = 0; i < ERROR.length; i++) {
     const cse = ERROR[i]
     t.is(toHex(encodeFrame(cse.descriptor)), frames[i], cse.note + ' frame')
@@ -67,9 +59,8 @@ test('error: frames match and codes decode as expected', function (t) {
   }
 })
 
-const bDir = path.join(__dirname, '..', 'fixtures', 'boundary')
 test('boundary: frames match and re-decode', function (t) {
-  const frames = JSON.parse(fs.readFileSync(path.join(bDir, 'frames.json')))
+  const { frames } = loadFamily('boundary')
   for (let i = 0; i < BOUNDARY.length; i++) {
     t.is(toHex(encodeFrame(BOUNDARY[i].descriptor)), frames[i], BOUNDARY[i].note)
     const msg = decodeFrame(Buffer.from(frames[i], 'hex'))
@@ -83,9 +74,8 @@ test('boundary: frames match and re-decode', function (t) {
   }
 })
 
-const seqDir = path.join(__dirname, '..', 'fixtures', 'sequence')
 test('sequence: concatenated frames re-split by length prefix', function (t) {
-  const { concatenated, count } = JSON.parse(fs.readFileSync(path.join(seqDir, 'frames.json')))
+  const { concatenated, count } = loadSequence()
   const buf = Buffer.from(concatenated, 'hex')
   const state = c.state(0, buf.length, buf)
   let seen = 0
@@ -98,11 +88,9 @@ test('sequence: concatenated frames re-split by length prefix', function (t) {
   t.is(seen, count, 'all frames re-split')
 })
 
-const dispatchDir = path.join(__dirname, '..', 'fixtures', 'dispatch')
 test('dispatch: frames carry schema-derived command ids and payloads round-trip', function (t) {
   const d = build()
-  const frames = JSON.parse(fs.readFileSync(path.join(dispatchDir, 'frames.json')))
-  const messages = JSON.parse(fs.readFileSync(path.join(dispatchDir, 'messages.json')))
+  const { frames, messages } = loadFamily('dispatch')
   t.is(frames.length, messages.length, 'one frame per message')
 
   const helloRequest = decodeFrame(Buffer.from(frames[0], 'hex'))
