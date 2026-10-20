@@ -1,7 +1,3 @@
 node_modules
 package-lock.json
-.venv
-dist
-__pycache__
-.pytest_cache
 docs/superpowers/
