@@ -1,6 +1,6 @@
 {
   "name": "hrpc-test",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Cross-language conformance vectors for hrpc command dispatch, on top of the bare-rpc wire vectors from bare-rpc-test",
   "license": "Apache-2.0",
   "author": "Holepunch",
