@@ -2,7 +2,6 @@ const fs = require('fs')
 const path = require('path')
 const c = require('compact-encoding')
 const { encodeFrame, toHex, decodeFrame, serializeDescriptor } = require('./lib/frame')
-const { ENVELOPE, ERROR, BOUNDARY, SEQUENCE } = require('./lib/cases')
 const { build } = require('./lib/dispatch-cases')
 const { build: buildSparse } = require('./lib/dispatch-sparse-cases')
 
@@ -20,23 +19,6 @@ function writeFamily(dir, cases) {
   fs.writeFileSync(path.join(dir, 'messages.json'), JSON.stringify(messages, null, 2) + '\n')
   fs.writeFileSync(path.join(dir, 'frames.json'), JSON.stringify(frames.map(toHex), null, 2) + '\n')
 }
-
-writeFamily(path.join(__dirname, 'fixtures', 'envelope'), ENVELOPE)
-console.log('generated envelope fixtures')
-
-writeFamily(path.join(__dirname, 'fixtures', 'error'), ERROR)
-console.log('generated error fixtures')
-
-writeFamily(path.join(__dirname, 'fixtures', 'boundary'), BOUNDARY)
-console.log('generated boundary fixtures')
-
-const seq = Buffer.concat(SEQUENCE.map(encodeFrame))
-fs.mkdirSync(path.join(__dirname, 'fixtures', 'sequence'), { recursive: true })
-fs.writeFileSync(
-  path.join(__dirname, 'fixtures', 'sequence', 'frames.json'),
-  JSON.stringify({ concatenated: toHex(seq), count: SEQUENCE.length }, null, 2) + '\n'
-)
-console.log('generated sequence fixture')
 
 const d = build()
 const dispatch = [
